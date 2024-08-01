@@ -1,42 +1,70 @@
-const notesContainer = document.querySelector(".notes-container");
-const createBtn = document.querySelector(".btn");
-let notes = document.querySelectorAll(".input-box");
+const notesContainer = document.getElementById("app");
+const addNoteButton = notesContainer.querySelector(".add-note");
 
-function showNotes() {
-  notesContainer.innerHTML = localStorage.getItem("notes");
+getNotes().forEach((note) => {
+  const noteElement = createNoteElement(note.id, note.content);
+  notesContainer.insertBefore(noteElement, addNoteButton);
+});
+
+addNoteButton.addEventListener("click", () => addNote());
+
+function getNotes() {
+  return JSON.parse(localStorage.getItem("stickynotes-notes") || "[]");
 }
-showNotes();
 
-function updateStorage() {
-  localStorage.setItem("notes", notesContainer.innerHTML);
+function saveNotes(notes) {
+  localStorage.setItem("stickynotes-notes", JSON.stringify(notes));
 }
 
-createBtn.addEventListener("click", () => {
-  let inputBox = document.createElement("p");
-  let img = document.createElement("img");
-  inputBox.className = "input-box";
-  inputBox.setAttribute("contenteditable", "true");
-  img.src = "images/icons8-delete-65.png";
-  notesContainer.appendChild(inputBox).appendChild(img);
-});
+function createNoteElement(id, content) {
+  const element = document.createElement("textarea");
 
-notesContainer.addEventListener("click", function (e) {
-  if (e.target.tagName === "IMG") {
-    e.target.parentElement.remove();
-    updateStorage();
-  } else if (e.target.tagName === "P") {
-    notes = document.querySelectorAll(".input-box");
-    notes.forEach((nt) => {
-      nt.onkeyup = function () {
-        updateStorage();
-      };
-    });
-  }
-});
+  element.classList.add("note");
+  element.value = content;
+  element.placeholder = "Empty Sticky Note";
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    document.execCommand("insertLineBreak");
-    event.preventDefault();
-  }
-});
+  element.addEventListener("change", () => {
+    updateNote(id, element.value);
+  });
+
+  element.addEventListener("dblclick", () => {
+    const doDelete = confirm(
+      "Are you sure you want to delete this sticky note?"
+    );
+
+    if (doDelete) {
+      deleteNote(id, element);
+    }
+  });
+
+  return element;
+}
+
+function addNote() {
+  const notes = getNotes();
+  const noteObject = {
+    id: Math.floor(Math.random() * 100000),
+    content: "",
+  };
+
+  const noteElement = createNoteElement(noteObject.id, noteObject.content);
+  notesContainer.insertBefore(noteElement, addNoteButton);
+
+  notes.push(noteObject);
+  saveNotes(notes);
+}
+
+function updateNote(id, newContent) {
+  const notes = getNotes();
+  const targetNote = notes.filter((note) => note.id == id)[0];
+
+  targetNote.content = newContent;
+  saveNotes(notes);
+}
+
+function deleteNote(id, element) {
+  const notes = getNotes().filter((note) => note.id != id);
+
+  saveNotes(notes);
+  notesContainer.removeChild(element);
+}

@@ -4,7 +4,7 @@
 
 ## ![Screenshot of the NoteWorthyNote app](images/noteworthynote_screenshot.png)
 
-## [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)]()
+## [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://noteworthynote.onrender.com)
 
 ## 🛠️ Tech Stack
 
